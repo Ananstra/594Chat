@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <title>Chat Client</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h3 class="text-muted">Chat Client</h3>
+      </div>
+      <div class="jumbotron", id="nick_box">
+        <p class="lead">Enter your nick:</p>
+        <form id="initial_form" class="input-group">
+          <input type="text" class="form-control" id="nick" placeholder="What's your nick?">
+          <span class="input-group-btn">
+            <button type="submit" class="btn btn-primary" id="submit_button">Submit</button>
+          </span>
+        </form>
+      </div>
+
+      <div id="chat_wrapper">
+        <div class="chat_area">
+          <div id="chats"></div>
+        </div>
+        <form id="chat_form" class="input-group">
+          <input type="text" class="form-control" id="chat" placeholder="Enter your message here">
+          <span class="input-group-btn">
+            <button type="submit" class="btn btn-success" id="send_button">Send</button>
+          </span>
+        </form>
+      </div>
+    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+
+    <script src="client.js"></script>
+  </body>
+</html>
