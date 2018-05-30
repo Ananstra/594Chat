@@ -30,10 +30,27 @@
           <div id="chats"></div>
         </div>
         <form id="chat_form" class="input-group">
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="channelButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Channel
+              </button>
+              <ul id="chanList" class="dropdown-menu" aria-labelledby="channelButton">
+                <li><button class="dropdown-item active" type="button" id="defaultButton">default</button></li>
+              </ul>
+            </div>
           <input type="text" class="form-control" id="chat" placeholder="Enter your message here">
           <span class="input-group-btn">
             <button type="submit" class="btn btn-success" id="send_button">Send</button>
           </span>
+        </form>
+        <div class="room_area">
+            <div id="rooms">default<br></div>
+        </div>
+        <form id="room_form" class="input-group">
+            <span class="input-group-btn">
+                <button type="submit" class = "btn btn-success" id="room_button">Join</button>
+            </span>
+            <input type="text" class="form-control" id="room" placeholder="Enter room name here">
         </form>
       </div>
     </div>

@@ -7,6 +7,15 @@
     border-style: solid;
 }
 
+.room_area {
+    height: 40em;
+    overflow-y: scroll;
+    border-color: rgb(0,0,255);
+    border-width: 1px;
+    border-radius: 4px 4px 0 0;
+    border-style: solid;
+}
+
 #chat_wrapper {
     display: none;
 }
