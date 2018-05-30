@@ -4,14 +4,12 @@ import asyncio
 import websockets
 
 connections = {}
-rooms = ["default"]
 async def connection_handler(websocket,path):
     try:
         print("New connection from", websocket)
         nick = await websocket.recv()
         connections[websocket] = {
             "nick": nick
-            "rooms": ["default"]
         }
         print("Got nick {}".format(nick))
         for conn in connections.keys():
