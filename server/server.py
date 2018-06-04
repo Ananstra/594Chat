@@ -20,7 +20,7 @@ def list_users(target):
     users = []
     for conn in connections.keys():
         if target in connections[conn]["rooms"]:
-            users.push(connections[conn]["nick"])
+            users.append(connections[conn]["nick"])
     return users
 
 async def connection_handler(websocket,path):
@@ -44,6 +44,7 @@ async def connection_handler(websocket,path):
         async for message in websocket:
             message_obj = json.loads(message)
             header = message_obj["header"]
+            print(message_obj)
             if header == "MSG":
                 target = message_obj["target"]
                 payload = json.dumps({
@@ -52,7 +53,33 @@ async def connection_handler(websocket,path):
                     "target":target,
                     "message":message_obj["message"]
                 })
-                await send_to_room(target, payload)
+                if target not in rooms:
+                    payload = json.dumps({
+                        "header":"INFO",
+                        "message":"No such room: {}".format(target)
+                    })
+                else:
+                    await send_to_room(target, payload)
+            elif header == "PRIVMSG":
+                target = message_obj["target"]
+                payload = json.dumps({
+                    "header":"MSG",
+                    "source":nick,
+                    "target":target,
+                    "message":message_obj["message"]
+                })
+                ws = None
+                for conn in connections.keys():
+                    if connections[conn]["nick"]==target:
+                            ws = conn
+                if ws:
+                    await ws.send(payload)
+                else:
+                    payload = json.dumps({
+                        "header":"INFO",
+                        "message":"No such user: {}".format(target)
+                    })
+
             elif header == "NICK":
                 oldnick = nick
                 nick = message_obj["nick"]
@@ -75,13 +102,20 @@ async def connection_handler(websocket,path):
                 await send_to_room(target,payload)
             elif header == "PART":
                 target = message_obj["target"]
-                connections[websocket]["rooms"].remove(target)
-                payload = json.dumps({
-                    "header":"PARTED",
-                    "source":nick,
-                    "target":target
-                })
-                await send_to_room(target,payload)
+                if target not in connections[websocket]["rooms"]:
+                    payload = json.dumps({
+                        "header":"INFO",
+                        "message":"No such room: {}".format(target)
+                    })
+                    await websocket.send(payload)
+                else:
+                    connections[websocket]["rooms"].remove(target)
+                    payload = json.dumps({
+                        "header":"PARTED",
+                        "source":nick,
+                        "target":target
+                    })
+                    await send_to_room(target,payload)
             elif header == "LIST":
                 payload = json.dumps({
                     "header":"LIST",
@@ -89,13 +123,22 @@ async def connection_handler(websocket,path):
                 })
                 await websocket.send(payload)
             elif header == "LISTNICKS":
-               target = message_obj["target"]
-               users = list_users(target)
-               payload = json.dumps({
-                   "header":"LISTNICKS",
-                   "users":users
-               })
-               await websocket.send(payload)
+                print("Got LISTNICKS request")
+                target = message_obj["target"]
+                if target not in rooms:
+                    payload = json.dumps({
+                        "header":"INFO",
+                        "message":"No such room: {}".format(target)
+                    })
+                    await websocket.send(payload)
+                else:
+                    users = list_users(target)
+                    payload = json.dumps({
+                        "header":"LISTNICKS",
+                        "target":target,
+                        "users":users
+                    })
+                    await websocket.send(payload)
     except websockets.exceptions.ConnectionClosed:
         c = connections.pop(websocket)
         nick = c["nick"]

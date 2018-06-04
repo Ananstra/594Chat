@@ -43,12 +43,20 @@
             <button type="submit" class="btn btn-success" id="send_button">Send</button>
           </span>
         </form>
+        <form id="priv_form" class="input-group">
+            <button type="submit" class="btn btn-success" id="priv_button">Private Message</button>
+            <input type="text" class="form-control" id="user_target" placeholder="User">
+            <input type="text" class="form-control" id="priv_message" placeholder="Enter private message here">
+        </form>
         <div class="room_area">
-            <div id="rooms">default<br></div>
+            <button type="button" class="btn btn-success" id="list_rooms">List Rooms</button>
+            <div id="rooms"><br>default<br></div>
         </div>
         <form id="room_form" class="input-group">
             <span class="input-group-btn">
                 <button type="submit" class = "btn btn-success" id="room_button">Join</button>
+                <button type="button" class="btn btn-success" id="part_button">Part</button>
+                <button type="button" class="btn btn-success" id="users_button">List Users</button>
             </span>
             <input type="text" class="form-control" id="room" placeholder="Enter room name here">
         </form>

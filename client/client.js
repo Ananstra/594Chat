@@ -1,6 +1,7 @@
 var server = 'ws://localhost:8080/';
 var roomList = new Array;
 var current = "default";
+roomList.push("default");
 function write_message(source,target,message) {
     var payload = '[' + target + '] ' + source + ': ' + message + '<br>';
     $('#chats').append(payload);
@@ -18,9 +19,17 @@ function write_parted(source,target){
     $('#chats').append(payload);
 }
 function write_rooms(rooms) {
-    var payload = "Rooms: ";
+    var payload = '[ROOMS]: ';
     rooms.forEach(room =>{
-        payload = payload + room + ' ';
+        payload = payload + room + ', ';
+    });
+    payload = payload + '<br>';
+    $('#chats').append(payload);
+}
+function write_users(users, target) {
+    var payload = '[USERS] ' + target + ':';
+    users.forEach(user =>{
+        payload = payload + user + ', ';
     });
     payload = payload + '<br>';
     $('#chats').append(payload);
@@ -64,11 +73,15 @@ $(document).ready(function() {
                 break;
             case "LIST":
                 write_rooms(obj.rooms);
+                break;
+            case "LISTNICKS":
+                write_users(obj.users, obj.target);
+                break;
             }
-        }
+        };
 
         socket.onclose = function(event) {
-            write_message('Disconnected from ' + server);
+            write_info('Disconnected from ' + server);
         };
 
         $('#chat_form').submit(function() {
@@ -82,14 +95,14 @@ $(document).ready(function() {
             current = "default";
             $('.dropdown-item').removeClass('active');
             $('#defaultButton').addClass('active');
-        })
+        });
         $('#room_form').submit(function(){
             var room = $('#room').val();
-            if (roomList.includes(room)) {
+            if(roomList.includes(room)) {
                 return false;
             }
             roomList.push(room);
-            var obj = {"header": "JOIN", "target": room}
+            var obj = {"header": "JOIN", "target": room};
             socket.send(JSON.stringify(obj));
             $('#room').val('');
             $('#rooms').append(room + '<br>');
@@ -104,6 +117,49 @@ $(document).ready(function() {
             });
             return false;
         });
+        $('#part_button').click(function () {
+           var room = $('#room').val();
+           $('#room').val('');
+           if(room == 'default') {
+               write_info('You cannot leave the default room.');
+           }
+           if(!roomList.includes(room)) {
+               return false;
+           }
+           roomList = roomList.filter(item => item !== room);
+           $('#'+room+'Button').remove();
+           var inn = $('#rooms').html();
+           console.log(inn);
+           $('#rooms').html(inn.replace('<br>'+room+'<br>','<br>'));
+           $('.dropdown-item').removeClass('active');
+           $('#defaultButton').addClass('active');
+           return false;
+        });
+        $('#users_button').click(function() {
+            var room = $('#room').val();
+            $('#room').val('');
+            if(!roomList.includes(room)){
+                return false;
+            }
+            var obj = { "header": "LISTNICKS", "target": room };
+            socket.send(JSON.stringify(obj));
+            return false;
+        });
+        $('#priv_form').submit(function(){
+            var target = $('#user_target').val();
+            var message = $('#priv_message').val();
+            $('#user_target').val('');
+            $('#priv_message').val('')
+            var obj = {"header": "PRIVMSG", "target": target, "message":message};
+            socket.send(JSON.stringify(obj));
+            return false;
+        });
+        $('#list_rooms').click(function(){
+            var obj = { "header": "LIST"};
+            socket.send(JSON.stringify(obj));
+            return false;
+        });
+
 
         return false;
     });
