@@ -6,6 +6,17 @@ function write_message(source,target,message) {
     var payload = '[' + target + '] ' + source + ': ' + message + '<br>';
     $('#chats').append(payload);
 }
+
+function write_privmsg(source,message){
+    var payload = '[FROM: ' + source + '] ' + message + '<br>';
+    $('#chats').append(payload);
+}
+
+function write_privout(target,message){
+    var payload = '[TO: ' + target +  '] ' + message + '<br>';
+    $('#chats').append(payload);
+}
+
 function write_joined(source,target){
     var payload = '[' + target + '] ' + source + ' has joined the channel.<br>';
     $('#chats').append(payload);
@@ -61,6 +72,9 @@ $(document).ready(function() {
             switch(obj.header){
             case "MSG":
                 write_message(obj.source, obj.target, obj.message);
+                break;
+            case "PRIVMSG":
+                write_privmsg(obj.source, obj.message);
                 break;
             case "JOINED":
                 write_joined(obj.source, obj.target);
@@ -152,6 +166,7 @@ $(document).ready(function() {
             $('#priv_message').val('')
             var obj = {"header": "PRIVMSG", "target": target, "message":message};
             socket.send(JSON.stringify(obj));
+            write_privout(target,message);
             return false;
         });
         $('#list_rooms').click(function(){

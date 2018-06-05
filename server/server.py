@@ -23,6 +23,12 @@ def list_users(target):
             users.append(connections[conn]["nick"])
     return users
 
+def validify_nick(nick):
+    for conn in connections.keys():
+        if nick == connections[conn]["nick"]:
+            return False
+    return True
+
 async def connection_handler(websocket,path):
     try:
         print("New connection from", websocket)
@@ -30,6 +36,16 @@ async def connection_handler(websocket,path):
         print(message)
         message_obj = json.loads(message)
         nick = message_obj["nick"]
+        altered = False
+        while not validify_nick(nick):
+            nick = nick + "_"
+            altered = True
+        if altered:
+            payload = json.dumps({
+                "header":"INFO",
+                "message":"Requested nick was taken, you are now known as {}".format(nick)
+            })
+            await websocket.send(payload)
         connections[websocket] = {
             "nick": nick,
             "rooms": ["default"]
@@ -63,9 +79,8 @@ async def connection_handler(websocket,path):
             elif header == "PRIVMSG":
                 target = message_obj["target"]
                 payload = json.dumps({
-                    "header":"MSG",
+                    "header":"PRIVMSG",
                     "source":nick,
-                    "target":target,
                     "message":message_obj["message"]
                 })
                 ws = None
@@ -79,10 +94,21 @@ async def connection_handler(websocket,path):
                         "header":"INFO",
                         "message":"No such user: {}".format(target)
                     })
+                    await websocket.send(payload)
 
             elif header == "NICK":
                 oldnick = nick
                 nick = message_obj["nick"]
+                altered = False
+                while not validify_nick(nick):
+                    nick = nick + "_"
+                    altered = True
+                if altered:
+                    payload = json.dumps({
+                        "header":"INFO",
+                        "message":"Requested nick was taken, you are now known as {}".format(nick)
+                    })
+                    await websocket.send(payload)
                 connections[websocket]["nick"]=nick
                 payload = json.dumps({
                     "header":"INFO",
